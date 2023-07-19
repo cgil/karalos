@@ -1,26 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense } from "react";
+import { Init } from "./init";
+import GlobalStyle from "./components/global-style/GlobalStyle";
+import { ThemeProvider } from "./components/theme-provider/theme-provider";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const renderSuspenseFallback = () => <div />;
 
-export default App;
+export const App = (): JSX.Element => (
+  <React.StrictMode>
+    <GlobalStyle />
+    <ThemeProvider>
+      <Suspense fallback={renderSuspenseFallback()}>
+        <Init />
+      </Suspense>
+    </ThemeProvider>
+  </React.StrictMode>
+);
