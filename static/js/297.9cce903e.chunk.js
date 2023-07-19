@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkkaralos=self.webpackChunkkaralos||[]).push([[297],{297:function(e,n,r){r.r(n);var s=r(184);n.default=function(){return(0,s.jsx)("div",{children:"Nothing to see here."})}}}]);
+//# sourceMappingURL=297.9cce903e.chunk.js.map
