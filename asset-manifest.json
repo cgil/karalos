@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/karalos/static/css/main.ae57cced.css",
-    "main.js": "/karalos/static/js/main.01dcc659.js",
+    "main.js": "/karalos/static/js/main.267c4f0f.js",
     "static/js/477.60a17471.chunk.js": "/karalos/static/js/477.60a17471.chunk.js",
     "static/js/297.9cce903e.chunk.js": "/karalos/static/js/297.9cce903e.chunk.js",
     "static/media/roboto-latin-500-normal.woff2": "/karalos/static/media/roboto-latin-500-normal.f25d774ecfe0996f8eb5.woff2",
@@ -62,12 +62,12 @@
     "static/media/roboto-greek-ext-700-normal.woff": "/karalos/static/media/roboto-greek-ext-700-normal.249853776d22a271b2b5.woff",
     "index.html": "/karalos/index.html",
     "main.ae57cced.css.map": "/karalos/static/css/main.ae57cced.css.map",
-    "main.01dcc659.js.map": "/karalos/static/js/main.01dcc659.js.map",
+    "main.267c4f0f.js.map": "/karalos/static/js/main.267c4f0f.js.map",
     "477.60a17471.chunk.js.map": "/karalos/static/js/477.60a17471.chunk.js.map",
     "297.9cce903e.chunk.js.map": "/karalos/static/js/297.9cce903e.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ae57cced.css",
-    "static/js/main.01dcc659.js"
+    "static/js/main.267c4f0f.js"
   ]
 }
