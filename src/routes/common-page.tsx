@@ -40,6 +40,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme["transitions"].easing.sharp,
     duration: theme["transitions"].duration.leavingScreen,
   }),
+  borderBottom: 1,
   ...(open && {
     marginLeft: `${toRem(drawerWidth)}`,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -86,7 +87,7 @@ const CommonPage: FC<CommonPageProps> = (props) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="absolute" open={open}>
+      <AppBar elevation={0} position="absolute" open={open}>
         <Toolbar
           sx={{
             pr: "24px", // keep right padding when drawer closed
@@ -116,7 +117,7 @@ const CommonPage: FC<CommonPageProps> = (props) => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open}>
+      <Drawer elevation={0} variant="permanent" open={open}>
         <Toolbar
           sx={{
             display: "flex",
