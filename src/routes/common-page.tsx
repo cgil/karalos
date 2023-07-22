@@ -11,7 +11,6 @@ import {
   ListItemText,
   styled,
 } from "@mui/material";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -84,16 +83,14 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-// eslint-disable-next-line max-lines-per-function
 const CommonPage: FC<CommonPageProps> = (props) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
+    <Box sx={{ display: "flex", backgroundColor: "white" }}>
       <AppBar elevation={0} position="absolute" open={open}>
         <Toolbar
           sx={{
