@@ -1,11 +1,15 @@
-import { FC } from "react";
+import { FC, useCallback, useState } from "react";
 import CommonPage from "../common-page";
 import { getFirebaseStorage } from "../../utils/firebase-utils/firebase-utils";
 import Carousel from "react-material-ui-carousel";
-import { Paper, Stack } from "@mui/material";
+import { IconButton, Paper, Stack } from "@mui/material";
 import useListItems from "../../utils/firebase-utils/use-list-items";
 import Image from "mui-image";
 import styled from "styled-components";
+import ZoomOutIcon from "@mui/icons-material/ZoomOutMap";
+import { useModal } from "../../components/modal/use-modal";
+import { toRem } from "../../utils/styled-components";
+import { ModalContainer } from "../../components/modal/modal-container";
 
 type CarouselItem = {
   url: string;
@@ -16,14 +20,35 @@ const StyledItem = styled(Paper)`
   height: 80vh;
 `;
 
+const StyledExpandLightBoxButton = styled(IconButton)`
+  position: absolute !important;
+  right: ${toRem(2)};
+  top: ${toRem(2)};
+  visibility: hidden;
+`;
+
+const StyledSpotlightImageContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &:hover {
+    ${StyledExpandLightBoxButton} {
+      visibility: visible;
+    }
+  }
+`;
+
 const SpotlightItem = ({
   item,
   itemLeft,
   itemRight,
+  onClick,
 }: {
   item: CarouselItem;
   itemLeft: CarouselItem | undefined;
   itemRight: CarouselItem | undefined;
+  onClick: (item: CarouselItem) => void;
 }) => {
   return (
     <StyledItem>
@@ -38,27 +63,39 @@ const SpotlightItem = ({
           src={itemLeft?.url ?? "#"}
           alt=""
           bgColor="#808080"
+          fit="cover"
           style={{
-            objectFit: "cover",
             filter: "grayscale(100%)",
           }}
           wrapperStyle={{ width: "13%" }}
           duration={1}
         />
-        <Image
-          src={item.url}
-          alt=""
-          showLoading
-          style={{ objectFit: "contain" }}
-          wrapperStyle={{ height: "100%", width: "maxContent" }}
-          duration={1000}
-        />
+        <StyledSpotlightImageContainer>
+          <Image
+            src={item.url}
+            alt=""
+            showLoading
+            fit="contain"
+            wrapperStyle={{
+              height: "100%",
+              width: "maxContent",
+              position: "relative",
+            }}
+            duration={1000}
+          />
+          <StyledExpandLightBoxButton
+            aria-label="expand-image"
+            onClick={() => onClick(item)}
+          >
+            <ZoomOutIcon />
+          </StyledExpandLightBoxButton>
+        </StyledSpotlightImageContainer>
         <Image
           src={itemRight?.url ?? "#"}
           alt=""
           bgColor="#808080"
+          fit="cover"
           style={{
-            objectFit: "cover",
             filter: "grayscale(100%)",
           }}
           wrapperStyle={{
@@ -75,8 +112,34 @@ const SpotlightItem = ({
 const useHomePage = () => {
   const firebaseStorage = getFirebaseStorage();
   const [photoList, photoListLoading] = useListItems(firebaseStorage);
+  const [lightBoxItem, setLightBoxItem] = useState<CarouselItem | null>(null);
+  const {
+    modalOpen: lightBoxOpen,
+    onOpenModal: onOpenLightBox,
+    onCloseModal: onCloseLightBox,
+  } = useModal();
 
-  return { photoList, photoListLoading };
+  const handleOpenLightBox = useCallback(
+    (item: CarouselItem) => {
+      setLightBoxItem(item);
+      onOpenLightBox();
+    },
+    [onOpenLightBox]
+  );
+
+  const handleCloseLightBox = useCallback(() => {
+    setLightBoxItem(null);
+    onCloseLightBox();
+  }, [onCloseLightBox]);
+
+  return {
+    photoList,
+    photoListLoading,
+    lightBoxItem,
+    lightBoxOpen,
+    handleOpenLightBox,
+    handleCloseLightBox,
+  };
 };
 
 const HomePage: FC = (): JSX.Element | null => {
@@ -88,7 +151,7 @@ const HomePage: FC = (): JSX.Element | null => {
   return (
     <CommonPage pageName="Home">
       <Carousel
-        autoPlay
+        autoPlay={false}
         stopAutoPlayOnHover
         interval={10000}
         animation="fade"
@@ -102,6 +165,7 @@ const HomePage: FC = (): JSX.Element | null => {
               <SpotlightItem
                 key={i}
                 item={item}
+                onClick={controller.handleOpenLightBox}
                 itemLeft={
                   controller.photoList?.[(i - 1 + listLength) % listLength]
                 }
@@ -110,6 +174,26 @@ const HomePage: FC = (): JSX.Element | null => {
             );
           })}
       </Carousel>
+      {controller.lightBoxOpen && (
+        <ModalContainer
+          isModalOpen={controller.lightBoxOpen}
+          onCloseModal={controller.handleCloseLightBox}
+          ariaLabel="image-light-box"
+        >
+          <Image
+            src={controller.lightBoxItem?.url ?? "#"}
+            alt=""
+            showLoading
+            fit="contain"
+            wrapperStyle={{
+              height: "100%",
+              width: "maxContent",
+              position: "relative",
+            }}
+            duration={1000}
+          />
+        </ModalContainer>
+      )}
     </CommonPage>
   );
 };
