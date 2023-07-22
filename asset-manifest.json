@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/karalos/static/css/main.ae57cced.css",
-    "main.js": "/karalos/static/js/main.066848b9.js",
-    "static/js/477.a72fd6de.chunk.js": "/karalos/static/js/477.a72fd6de.chunk.js",
-    "static/js/618.100bd814.chunk.js": "/karalos/static/js/618.100bd814.chunk.js",
+    "main.js": "/karalos/static/js/main.f6b4f8fd.js",
+    "static/js/477.fe2c9e25.chunk.js": "/karalos/static/js/477.fe2c9e25.chunk.js",
+    "static/js/618.d56a01d2.chunk.js": "/karalos/static/js/618.d56a01d2.chunk.js",
     "static/js/297.cdc3562d.chunk.js": "/karalos/static/js/297.cdc3562d.chunk.js",
-    "static/js/995.1958ec91.chunk.js": "/karalos/static/js/995.1958ec91.chunk.js",
-    "static/js/968.c55e9685.chunk.js": "/karalos/static/js/968.c55e9685.chunk.js",
+    "static/js/512.92d76bfe.chunk.js": "/karalos/static/js/512.92d76bfe.chunk.js",
+    "static/js/667.5230035f.chunk.js": "/karalos/static/js/667.5230035f.chunk.js",
     "static/media/roboto-latin-500-normal.woff2": "/karalos/static/media/roboto-latin-500-normal.f25d774ecfe0996f8eb5.woff2",
     "static/media/roboto-latin-700-normal.woff2": "/karalos/static/media/roboto-latin-700-normal.227c93190fe7f82de3f8.woff2",
     "static/media/roboto-latin-400-normal.woff2": "/karalos/static/media/roboto-latin-400-normal.b009a76ad6afe4ebd301.woff2",
@@ -65,15 +65,15 @@
     "static/media/roboto-greek-ext-700-normal.woff": "/karalos/static/media/roboto-greek-ext-700-normal.249853776d22a271b2b5.woff",
     "index.html": "/karalos/index.html",
     "main.ae57cced.css.map": "/karalos/static/css/main.ae57cced.css.map",
-    "main.066848b9.js.map": "/karalos/static/js/main.066848b9.js.map",
-    "477.a72fd6de.chunk.js.map": "/karalos/static/js/477.a72fd6de.chunk.js.map",
-    "618.100bd814.chunk.js.map": "/karalos/static/js/618.100bd814.chunk.js.map",
+    "main.f6b4f8fd.js.map": "/karalos/static/js/main.f6b4f8fd.js.map",
+    "477.fe2c9e25.chunk.js.map": "/karalos/static/js/477.fe2c9e25.chunk.js.map",
+    "618.d56a01d2.chunk.js.map": "/karalos/static/js/618.d56a01d2.chunk.js.map",
     "297.cdc3562d.chunk.js.map": "/karalos/static/js/297.cdc3562d.chunk.js.map",
-    "995.1958ec91.chunk.js.map": "/karalos/static/js/995.1958ec91.chunk.js.map",
-    "968.c55e9685.chunk.js.map": "/karalos/static/js/968.c55e9685.chunk.js.map"
+    "512.92d76bfe.chunk.js.map": "/karalos/static/js/512.92d76bfe.chunk.js.map",
+    "667.5230035f.chunk.js.map": "/karalos/static/js/667.5230035f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ae57cced.css",
-    "static/js/main.066848b9.js"
+    "static/js/main.f6b4f8fd.js"
   ]
 }
