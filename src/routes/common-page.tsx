@@ -16,7 +16,8 @@ import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import CarouselIcon from "@mui/icons-material/ViewCarousel";
+import CollectionsIcon from "@mui/icons-material/Collections";
 import React, { ReactNode } from "react";
 import { FC } from "react";
 import { toRem } from "../utils/styled-components";
@@ -142,9 +143,20 @@ const CommonPage: FC<CommonPageProps> = (props) => {
             <StyledLink to="/">
               <ListItemButton>
                 <ListItemIcon>
-                  <DashboardIcon />
+                  <CarouselIcon />
                 </ListItemIcon>
                 <ListItemText primary="Home" />
+              </ListItemButton>
+            </StyledLink>
+          </React.Fragment>
+          <Divider sx={{ my: 1 }} />
+          <React.Fragment>
+            <StyledLink to="/gallery">
+              <ListItemButton>
+                <ListItemIcon>
+                  <CollectionsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Gallery" />
               </ListItemButton>
             </StyledLink>
           </React.Fragment>
