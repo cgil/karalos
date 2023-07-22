@@ -151,7 +151,7 @@ const HomePage: FC = (): JSX.Element | null => {
   return (
     <CommonPage pageName="Home">
       <Carousel
-        autoPlay={false}
+        autoPlay
         stopAutoPlayOnHover
         interval={10000}
         animation="fade"
