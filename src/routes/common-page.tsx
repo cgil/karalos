@@ -20,6 +20,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import React, { ReactNode } from "react";
 import { FC } from "react";
 import { toRem } from "../utils/styled-components";
+import { Link } from "react-router-dom";
 
 type CommonPageProps = {
   children: ReactNode;
@@ -31,6 +32,11 @@ const drawerWidth: number = 240;
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop: string) => prop !== "open",
@@ -133,22 +139,16 @@ const CommonPage: FC<CommonPageProps> = (props) => {
         <Divider />
         <List component="nav">
           <React.Fragment>
-            <ListItemButton>
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItemButton>
+            <StyledLink to="/">
+              <ListItemButton>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
+              </ListItemButton>
+            </StyledLink>
           </React.Fragment>
           <Divider sx={{ my: 1 }} />
-          <React.Fragment>
-            <ListItemButton>
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
-              <ListItemText primary="Gallery" />
-            </ListItemButton>
-          </React.Fragment>
         </List>
       </Drawer>
       <Box
