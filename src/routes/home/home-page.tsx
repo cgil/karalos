@@ -35,6 +35,7 @@ const StyledSpotlightImageContainer = styled.div`
   &:hover {
     ${StyledExpandLightBoxButton} {
       visibility: visible;
+      cursor: pointer;
     }
   }
 `;
