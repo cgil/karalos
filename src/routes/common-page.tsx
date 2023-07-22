@@ -164,7 +164,7 @@ const CommonPage: FC<CommonPageProps> = (props) => {
         }}
       >
         <Toolbar />
-        <Container maxWidth="lg" sx={{ m: 4 }}>
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
           {props.children}
         </Container>
       </Box>
@@ -172,5 +172,4 @@ const CommonPage: FC<CommonPageProps> = (props) => {
   );
 };
 
-// eslint-disable-next-line import/no-default-export
 export default CommonPage;
