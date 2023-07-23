@@ -1,6 +1,6 @@
 import { FC, useCallback, useState } from "react";
 import CommonPage from "../common-page";
-import { getFirebaseStorage } from "../../utils/firebase-utils/firebase-utils";
+import { getFirebaseStorageRef } from "../../utils/firebase-utils/firebase-utils";
 import Carousel from "react-material-ui-carousel";
 import { IconButton, Paper, Stack } from "@mui/material";
 import useListItems from "../../utils/firebase-utils/use-list-items";
@@ -111,7 +111,7 @@ const SpotlightItem = ({
 };
 
 const useHomePage = () => {
-  const firebaseStorage = getFirebaseStorage();
+  const firebaseStorage = getFirebaseStorageRef();
   const [photoList, photoListLoading] = useListItems(firebaseStorage);
   const [lightBoxItem, setLightBoxItem] = useState<CarouselItem | null>(null);
   const {

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import CommonPage from "../common-page";
-import { getFirebaseStorage } from "../../utils/firebase-utils/firebase-utils";
+import { getFirebaseStorageRef } from "../../utils/firebase-utils/firebase-utils";
 import { Box, ImageList, ImageListItem } from "@mui/material";
 import useListItems from "../../utils/firebase-utils/use-list-items";
 import styled from "styled-components";
@@ -13,7 +13,7 @@ const StyledImageListItem = styled(ImageListItem)`
 `;
 
 const useGalleryPage = () => {
-  const firebaseStorage = getFirebaseStorage();
+  const firebaseStorage = getFirebaseStorageRef();
   const [photoList, photoListLoading] = useListItems(firebaseStorage);
 
   return { photoList, photoListLoading };
