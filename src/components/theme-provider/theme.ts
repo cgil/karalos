@@ -29,14 +29,14 @@ export const theme: DefaultTheme = createTheme({
   },
   palette: {
     primary: {
-      light: "#E8E9FF",
-      main: "#2652CD",
-      dark: "#0036AB",
+      light: "#9ca3af",
+      main: "#374151",
+      dark: "#111827",
     },
     secondary: {
-      light: "#E4F8ED",
-      main: "#0ACF83",
-      dark: "#009147",
+      light: "#c7d2fe",
+      main: "#818cf8",
+      dark: "#4338ca",
     },
     error: {
       light: "#FFEAEC",
@@ -80,7 +80,6 @@ export const theme: DefaultTheme = createTheme({
       '"Apple Color Emoji"',
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
-      "NeueHaasUnicaPro-Bold",
     ].join(","),
     h1: {
       fontSize: "2.25rem",

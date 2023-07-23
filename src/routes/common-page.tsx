@@ -10,6 +10,7 @@ import {
   ListItemIcon,
   ListItemText,
   styled,
+  Button,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
@@ -21,6 +22,7 @@ import React, { ReactNode } from "react";
 import { FC } from "react";
 import { toRem } from "../utils/styled-components";
 import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/use-auth/use-auth";
 
 type CommonPageProps = {
   children: ReactNode;
@@ -84,6 +86,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const CommonPage: FC<CommonPageProps> = (props) => {
+  const auth = useAuth();
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -119,6 +122,15 @@ const CommonPage: FC<CommonPageProps> = (props) => {
           >
             {props.pageName}
           </Typography>
+          {auth.user ? (
+            <Button onClick={auth.logout} color="primary">
+              Logout
+            </Button>
+          ) : (
+            <Button component={Link} to="/sign-in" color="inherit">
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer elevation={0} variant="permanent" open={open}>
