@@ -4,8 +4,11 @@ import { ref as firebaseRef } from "firebase/storage";
 import { useUploadFile } from "react-firebase-hooks/storage";
 import { getFirebaseStorageRef } from "../../utils/firebase-utils/firebase-utils";
 import { useDropzone } from "react-dropzone";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { Container, Stack } from "@mui/system";
+import { EditText } from "react-edit-text";
+import "react-edit-text/dist/index.css";
+
 import {
   Box,
   Button,
@@ -18,6 +21,7 @@ import {
 } from "@mui/material";
 import { toRem } from "../../utils/styled-components";
 import UploadIcon from "@mui/icons-material/CloudUpload";
+import { LoadingButton } from "@mui/lab";
 
 type FileType = File & { preview: string };
 
@@ -44,21 +48,23 @@ const PreviewContainer = styled(Stack)`
 `;
 
 const AdminPage: FC = (): JSX.Element | null => {
+  const theme = useTheme();
   const storageRef = getFirebaseStorageRef();
   const [files, setFiles] = useState<FileType[]>([]);
-  const [uploadFile, uploading, snapshot, error] = useUploadFile();
-  const ref = firebaseRef(storageRef, "file.jpg");
+  const [uploadFile, uploading] = useUploadFile();
 
   const handleUploadAll = async () => {
-    files.forEach(async (selectedFile) => {
-      if (selectedFile) {
-        console.log(selectedFile.type);
-        const result = await uploadFile(ref, selectedFile, {
-          contentType: "image/*",
-        });
-        console.log(`Result: ${JSON.stringify(result)}`);
-      }
-    });
+    Promise.allSettled(
+      files.map(async (selectedFile) => {
+        if (selectedFile) {
+          const fileName = selectedFile.name.toLowerCase().replace(/\s+/g, "-");
+          const ref = firebaseRef(storageRef, fileName);
+          return uploadFile(ref, selectedFile, {
+            contentType: `image/${selectedFile.type}`,
+          });
+        }
+      })
+    ).then(() => setFiles([]));
   };
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -78,6 +84,31 @@ const AdminPage: FC = (): JSX.Element | null => {
     const newFiles = [...files];
     newFiles.splice(newFiles.indexOf(file), 1);
     setFiles(newFiles);
+  };
+
+  const handleUpdateFileName = (name: string, fileIndex: number) => {
+    let allFiles = [...files];
+    const fileToUpdate: FileType = allFiles[fileIndex];
+    const fileName = (name.substring(0, name.lastIndexOf(".")) || name)
+      .replace(/\s+/g, "-")
+      .toLowerCase();
+
+    const fileExtension = fileToUpdate.type.slice(
+      fileToUpdate.type.lastIndexOf("/") + 1
+    );
+
+    const updatedFile = new File(
+      [fileToUpdate],
+      `${fileName}.${fileExtension}`,
+      {
+        type: fileToUpdate.type,
+      }
+    );
+
+    allFiles[fileIndex] = Object.assign(updatedFile, {
+      preview: URL.createObjectURL(updatedFile),
+    });
+    setFiles(allFiles);
   };
 
   useEffect(
@@ -101,7 +132,7 @@ const AdminPage: FC = (): JSX.Element | null => {
             title={files.length > 0 ? null : "No files added to Upload."}
           >
             <span>
-              <Button
+              <LoadingButton
                 size="medium"
                 type="button"
                 variant="contained"
@@ -109,9 +140,11 @@ const AdminPage: FC = (): JSX.Element | null => {
                 color="secondary"
                 disabled={!(files.length > 0)}
                 startIcon={<UploadIcon />}
+                loading={uploading}
+                loadingPosition="start"
               >
                 Upload
-              </Button>
+              </LoadingButton>
             </span>
           </Tooltip>
         </Stack>
@@ -142,7 +175,7 @@ const AdminPage: FC = (): JSX.Element | null => {
           spacing={2}
           useFlexGap
         >
-          {files.map((file: FileType) => (
+          {files.map((file: FileType, fileIndex: number) => (
             <Card sx={{ maxWidth: 280, display: "flex" }} key={file.name}>
               <Box
                 sx={{
@@ -158,7 +191,7 @@ const AdminPage: FC = (): JSX.Element | null => {
                   sx={{
                     width: "auto",
                     maxWidth: toRem(130),
-                    height: toRem(130),
+                    height: toRem(133),
                     objectFit: "cover",
                   }}
                 />
@@ -175,14 +208,33 @@ const AdminPage: FC = (): JSX.Element | null => {
                     Pending upload
                   </Typography>
                   <Tooltip title={file.name}>
-                    <Typography
-                      gutterBottom
-                      noWrap
-                      variant="body1"
-                      component="div"
-                    >
-                      {file.name}
-                    </Typography>
+                    <Stack direction="row">
+                      <span style={{ width: `calc(100% - ${30}px)` }}>
+                        <EditText
+                          defaultValue={file.name.slice(
+                            0,
+                            file.name.lastIndexOf(".")
+                          )}
+                          onSave={(data) =>
+                            handleUpdateFileName(data.value, fileIndex)
+                          }
+                          placeholder="Image name"
+                          style={{
+                            border: `${toRem(1)} solid #ffff`,
+                            paddingLeft: 0,
+                            fontSize: theme["typography"].body1.fontSize,
+                          }}
+                        />
+                      </span>
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        color="text.secondary"
+                        style={{ width: toRem(30), lineHeight: toRem(34) }}
+                      >
+                        .{file.type.slice(file.type.lastIndexOf("/") + 1)}
+                      </Typography>
+                    </Stack>
                   </Tooltip>
                 </CardContent>
                 <CardActions>
