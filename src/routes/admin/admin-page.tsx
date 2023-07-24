@@ -26,8 +26,8 @@ import { LoadingButton } from "@mui/lab";
 
 type FileType = File & {
   preview: string;
-  GPSLatitude: string | undefined;
-  GPSLongitude: string | undefined;
+  Latitude: number | undefined;
+  Longitude: number | undefined;
 };
 
 const DropzoneContainer = styled.div`
@@ -67,8 +67,8 @@ const AdminPage: FC = (): JSX.Element | null => {
           return uploadFile(ref, selectedFile, {
             contentType: `image/${selectedFile.type}`,
             customMetadata: {
-              GPSLatitude: selectedFile.GPSLatitude ?? "",
-              GPSLongitude: selectedFile.GPSLongitude ?? "",
+              Latitude: selectedFile.Latitude?.toString() ?? "",
+              Longitude: selectedFile.Longitude?.toString() ?? "",
             },
           });
         }
@@ -81,11 +81,11 @@ const AdminPage: FC = (): JSX.Element | null => {
     onDrop: (acceptedFiles) => {
       Promise.all(
         acceptedFiles.map(async (file) => {
-          const fileTags = await ExifReader.load(file);
+          const fileTags = await ExifReader.load(file, { expanded: true });
           return Object.assign(file, {
             preview: URL.createObjectURL(file),
-            GPSLatitude: fileTags.GPSLatitude?.description,
-            GPSLongitude: fileTags.GPSLongitude?.description,
+            Latitude: fileTags.gps?.Latitude,
+            Longitude: fileTags.gps?.Longitude,
           });
         })
       ).then((files) => setFiles(files));
@@ -119,8 +119,8 @@ const AdminPage: FC = (): JSX.Element | null => {
 
     allFiles[fileIndex] = Object.assign(updatedFile, {
       preview: URL.createObjectURL(updatedFile),
-      GPSLatitude: fileToUpdate.GPSLatitude,
-      GPSLongitude: fileToUpdate.GPSLongitude,
+      Latitude: fileToUpdate.Latitude,
+      Longitude: fileToUpdate.Longitude,
     });
     setFiles(allFiles);
   };
