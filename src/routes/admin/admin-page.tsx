@@ -8,6 +8,7 @@ import styled, { useTheme } from "styled-components";
 import { Container, Stack } from "@mui/system";
 import { EditText } from "react-edit-text";
 import "react-edit-text/dist/index.css";
+import ExifReader from "exifreader";
 
 import {
   Box,
@@ -23,7 +24,11 @@ import { toRem } from "../../utils/styled-components";
 import UploadIcon from "@mui/icons-material/CloudUpload";
 import { LoadingButton } from "@mui/lab";
 
-type FileType = File & { preview: string };
+type FileType = File & {
+  preview: string;
+  GPSLatitude: string | undefined;
+  GPSLongitude: string | undefined;
+};
 
 const DropzoneContainer = styled.div`
   flex: 1;
@@ -61,6 +66,10 @@ const AdminPage: FC = (): JSX.Element | null => {
           const ref = firebaseRef(storageRef, fileName);
           return uploadFile(ref, selectedFile, {
             contentType: `image/${selectedFile.type}`,
+            customMetadata: {
+              GPSLatitude: selectedFile.GPSLatitude ?? "",
+              GPSLongitude: selectedFile.GPSLongitude ?? "",
+            },
           });
         }
       })
@@ -70,13 +79,16 @@ const AdminPage: FC = (): JSX.Element | null => {
   const { getRootProps, getInputProps, open } = useDropzone({
     accept: { "image/*": [] },
     onDrop: (acceptedFiles) => {
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
+      Promise.all(
+        acceptedFiles.map(async (file) => {
+          const fileTags = await ExifReader.load(file);
+          return Object.assign(file, {
             preview: URL.createObjectURL(file),
-          })
-        )
-      );
+            GPSLatitude: fileTags.GPSLatitude?.description,
+            GPSLongitude: fileTags.GPSLongitude?.description,
+          });
+        })
+      ).then((files) => setFiles(files));
     },
   });
 
@@ -107,6 +119,8 @@ const AdminPage: FC = (): JSX.Element | null => {
 
     allFiles[fileIndex] = Object.assign(updatedFile, {
       preview: URL.createObjectURL(updatedFile),
+      GPSLatitude: fileToUpdate.GPSLatitude,
+      GPSLongitude: fileToUpdate.GPSLongitude,
     });
     setFiles(allFiles);
   };
