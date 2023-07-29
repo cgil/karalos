@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import CommonPage from "../common-page";
 import { ref as firebaseRef } from "firebase/storage";
 import { useUploadFile } from "react-firebase-hooks/storage";
@@ -58,7 +58,7 @@ const AdminPage: FC = (): JSX.Element | null => {
   const [files, setFiles] = useState<FileType[]>([]);
   const [uploadFile, uploading] = useUploadFile();
 
-  const handleUploadAll = async () => {
+  const handleUploadAll = useCallback(async () => {
     Promise.allSettled(
       files.map(async (selectedFile) => {
         if (selectedFile) {
@@ -74,7 +74,7 @@ const AdminPage: FC = (): JSX.Element | null => {
         }
       })
     ).then(() => setFiles([]));
-  };
+  }, [files, storageRef, uploadFile]);
 
   const { getRootProps, getInputProps, open } = useDropzone({
     accept: { "image/*": [] },
@@ -92,42 +92,48 @@ const AdminPage: FC = (): JSX.Element | null => {
     },
   });
 
-  const removeFile = (file: FileType) => () => {
-    const newFiles = [...files];
-    newFiles.splice(newFiles.indexOf(file), 1);
-    setFiles(newFiles);
-  };
+  const removeFile = useCallback(
+    (file: FileType) => () => {
+      const newFiles = [...files];
+      newFiles.splice(newFiles.indexOf(file), 1);
+      setFiles(newFiles);
+    },
+    [files]
+  );
 
-  const handleUpdateFileName = (name: string, fileIndex: number) => {
-    let allFiles = [...files];
-    const fileToUpdate: FileType = allFiles[fileIndex];
-    const fileName = (name.substring(0, name.lastIndexOf(".")) || name)
-      .replace(/\s+/g, "-")
-      .toLowerCase();
+  const handleUpdateFileName = useCallback(
+    (name: string, fileIndex: number) => {
+      let allFiles = [...files];
+      const fileToUpdate: FileType = allFiles[fileIndex];
+      const fileName = (name.substring(0, name.lastIndexOf(".")) || name)
+        .replace(/\s+/g, "-")
+        .toLowerCase();
 
-    const fileExtension = fileToUpdate.type.slice(
-      fileToUpdate.type.lastIndexOf("/") + 1
-    );
+      const fileExtension = fileToUpdate.type.slice(
+        fileToUpdate.type.lastIndexOf("/") + 1
+      );
 
-    const updatedFile = new File(
-      [fileToUpdate],
-      `${fileName}.${fileExtension}`,
-      {
-        type: fileToUpdate.type,
-      }
-    );
+      const updatedFile = new File(
+        [fileToUpdate],
+        `${fileName}.${fileExtension}`,
+        {
+          type: fileToUpdate.type,
+        }
+      );
 
-    allFiles[fileIndex] = Object.assign(updatedFile, {
-      preview: URL.createObjectURL(updatedFile),
-      Latitude: fileToUpdate.Latitude,
-      Longitude: fileToUpdate.Longitude,
-    });
-    setFiles(allFiles);
-  };
+      allFiles[fileIndex] = Object.assign(updatedFile, {
+        preview: URL.createObjectURL(updatedFile),
+        Latitude: fileToUpdate.Latitude,
+        Longitude: fileToUpdate.Longitude,
+      });
+      setFiles(allFiles);
+    },
+    [files]
+  );
 
   useEffect(
     () => () => {
-      // Make sure to revoke the data uris to avoid memory leaks
+      // Revoke the data uris to avoid memory leaks
       files.forEach((file) => URL.revokeObjectURL(file.preview));
     },
     [files]
