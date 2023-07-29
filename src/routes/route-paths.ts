@@ -1,7 +1,9 @@
 export const routePaths = {
   basename: process.env.PUBLIC_URL,
   home: "/",
-  admin: "/admin",
+  admin: "/admin/*",
+  adminUpload: "upload",
+  adminManage: "manage",
   signIn: "/sign-in",
 } as const;
 

@@ -22,7 +22,7 @@ export const Init = (): JSX.Element | null => {
               <AdminPage />
             </PrivateRoute>
           }
-          path="/admin"
+          path={routePaths.admin}
         />
         <Route element={<NotFoundPage />} path="/404" />
         <Route element={<Navigate to="/404" />} path="*" />
