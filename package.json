@@ -2,7 +2,7 @@
   "name": "karalos",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://cgil.github.io/karalos",
+  "homepage": "https://karalos.com",
   "dependencies": {
     "@fontsource/roboto": "^5.0.5",
     "@minoru/react-dnd-treeview": "^3.4.4",
