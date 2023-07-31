@@ -71,7 +71,7 @@ export const useUploadManyFiles = (): UseUploadManyFiles => {
         // this is to make types pass
         const fakeParentMetadata = await getMetadata(result.ref);
 
-        // TODO: Delete the temp file we just created
+        // TODO: Delete the tempfile we just created
 
         return { ref: parentRef, metadata: fakeParentMetadata };
       });

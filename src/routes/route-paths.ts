@@ -1,5 +1,5 @@
 export const routePaths = {
-  basename: process.env.PUBLIC_URL,
+  basename: "",
   home: "/",
   admin: "/admin/*",
   adminUpload: "upload",
