@@ -24,7 +24,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "plugins": [
       {
-        "name": "@styled/typescript-styled-plugin"
+        "name": "@styled/typescript-styled-plugin",
+        "name": "typescript-plugin-css-modules"
       }
     ],
     "paths": {

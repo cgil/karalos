@@ -14,7 +14,10 @@ const StyledImageListItem = styled(ImageListItem)`
 
 const useGalleryPage = () => {
   const firebaseStorage = getFirebaseStorageRef();
-  const [photoList, photoListLoading] = useListItems(firebaseStorage);
+  const { data: photoList, loading: photoListLoading } = useListItems({
+    storageRef: firebaseStorage,
+    fetchFiles: true,
+  });
 
   return { photoList, photoListLoading };
 };
@@ -29,11 +32,11 @@ const GalleryPage: FC = (): JSX.Element | null => {
     <CommonPage pageName="Gallery">
       <Box sx={{ width: "100%", height: "100%", overflowY: "scroll" }}>
         <ImageList variant="masonry" cols={3} gap={12}>
-          {(controller.photoList ?? []).map((item) => (
-            <StyledImageListItem key={item.url}>
+          {(controller.photoList?.files ?? []).map((file) => (
+            <StyledImageListItem key={file.url}>
               <img
-                src={`${item.url}?w=248&fit=crop&auto=format`}
-                srcSet={`${item.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                src={`${file.url}?w=248&fit=crop&auto=format`}
+                srcSet={`${file.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
                 alt={""}
                 loading="lazy"
               />

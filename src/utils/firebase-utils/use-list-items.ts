@@ -1,17 +1,42 @@
 import {
   getDownloadURL,
-  list,
+  listAll,
   StorageError,
   StorageReference,
 } from "firebase/storage";
 import { useEffect, useRef } from "react";
+import { RequireAtLeastOne } from "../type-utils";
 import useLoadingValue from "./use-loading-value";
 
-export type ListItem = {
+type UseListItemsProps = RequireAtLeastOne<
+  {
+    storageRef?: StorageReference | null;
+    fetchFiles?: boolean;
+    fetchFolders?: boolean;
+  },
+  "fetchFiles" | "fetchFolders"
+>;
+
+export type FileItem = {
+  name: string;
+  path: string;
   url: string;
 };
-export type LoadingHook<T, E> = [T | undefined, boolean, E | undefined];
-export type ListItemsHook = LoadingHook<ListItem[], StorageError>;
+export type FolderItem = {
+  name: string;
+  path: string;
+};
+export type ListItems = {
+  files?: FileItem[];
+  folders?: FolderItem[];
+};
+
+export type LoadingHook<T, E> = {
+  data: T | undefined;
+  loading: boolean;
+  error: E | undefined;
+};
+export type ListItemsHook = LoadingHook<ListItems, StorageError>;
 
 export type RefHook<T> = {
   current: T;
@@ -43,34 +68,51 @@ const isEqual = (
   return bothNull || equal;
 };
 
-const useListItems = (storageRef?: StorageReference | null): ListItemsHook => {
+const useListItems = (props: UseListItemsProps): ListItemsHook => {
   const { error, loading, reset, setError, setValue, value } = useLoadingValue<
-    ListItem[],
+    ListItems,
     StorageError
   >();
-  const ref = useComparatorRef(storageRef, isEqual, reset);
+  const ref = useComparatorRef(props.storageRef, isEqual, reset);
 
   useEffect(() => {
     if (!ref.current) {
       setValue(undefined);
       return;
     }
-    list(ref.current)
-      .then((listResult) =>
-        Promise.all(listResult.items.map((item) => getDownloadURL(item)))
-      )
-      .then((urls) => {
-        setValue(
-          urls.map((url) => ({
-            url,
-          }))
-        );
+    listAll(ref.current)
+      .then((listResult) => {
+        return Promise.all([
+          props.fetchFiles
+            ? Promise.all(
+                listResult.items.map((item) => getDownloadURL(item))
+              ).then((urls) =>
+                urls.map((url, i) => ({
+                  url: url,
+                  path: listResult.items[i].fullPath,
+                  name: listResult.items[i].name,
+                }))
+              )
+            : undefined,
+          props.fetchFolders
+            ? listResult.prefixes.map((prefix) => ({
+                name: prefix.name,
+                path: prefix.fullPath,
+              }))
+            : undefined,
+        ]);
+      })
+      .then(([files, folders]) => {
+        setValue({
+          files: files,
+          folders: folders,
+        });
       })
       .catch(setError);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current]);
 
-  return [value, loading, error];
+  return { data: value, loading, error };
 };
 
 export default useListItems;

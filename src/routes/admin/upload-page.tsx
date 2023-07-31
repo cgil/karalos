@@ -24,12 +24,7 @@ import { toRem } from "../../utils/styled-components";
 import UploadIcon from "@mui/icons-material/CloudUpload";
 import { LoadingButton } from "@mui/lab";
 import { AdminLayout } from "./components/admin-layout";
-
-type FileType = File & {
-  preview: string;
-  Latitude: number | undefined;
-  Longitude: number | undefined;
-};
+import { type FileType } from "../../utils/firebase-utils/use-upload-many-files";
 
 const DropzoneContainer = styled.div`
   flex: 1;

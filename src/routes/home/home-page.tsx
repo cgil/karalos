@@ -112,7 +112,10 @@ const SpotlightItem = ({
 
 const useHomePage = () => {
   const firebaseStorage = getFirebaseStorageRef();
-  const [photoList, photoListLoading] = useListItems(firebaseStorage);
+  const { data: photoList, loading: photoListLoading } = useListItems({
+    storageRef: firebaseStorage,
+    fetchFiles: true,
+  });
   const [lightBoxItem, setLightBoxItem] = useState<CarouselItem | null>(null);
   const {
     modalOpen: lightBoxOpen,
@@ -159,18 +162,21 @@ const HomePage: FC = (): JSX.Element | null => {
         duration={1000}
       >
         {controller.photoList &&
-          controller.photoList.length > 0 &&
-          controller.photoList.map((item, i) => {
-            const listLength = controller.photoList?.length || 0;
+          controller.photoList.files &&
+          controller.photoList.files.length > 0 &&
+          controller.photoList.files.map((file, i) => {
+            const listLength = controller.photoList?.files?.length || 0;
             return (
               <SpotlightItem
                 key={i}
-                item={item}
+                item={file}
                 onClick={controller.handleOpenLightBox}
                 itemLeft={
-                  controller.photoList?.[(i - 1 + listLength) % listLength]
+                  controller.photoList?.files?.[
+                    (i - 1 + listLength) % listLength
+                  ]
                 }
-                itemRight={controller.photoList?.[(i + 1) % listLength]}
+                itemRight={controller.photoList?.files?.[(i + 1) % listLength]}
               />
             );
           })}

@@ -1,148 +1,246 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import CommonPage from "../common-page";
-import { ref as firebaseRef } from "firebase/storage";
-import { useUploadFile } from "react-firebase-hooks/storage";
-import { getFirebaseStorageRef } from "../../utils/firebase-utils/firebase-utils";
-import { useDropzone } from "react-dropzone";
-import styled, { useTheme } from "styled-components";
-import { Container, Stack } from "@mui/system";
-import { EditText } from "react-edit-text";
-import "react-edit-text/dist/index.css";
-import ExifReader from "exifreader";
+import { DndProvider } from "react-dnd";
 
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { toRem } from "../../utils/styled-components";
-import UploadIcon from "@mui/icons-material/CloudUpload";
-import { LoadingButton } from "@mui/lab";
+  Tree,
+  MultiBackend,
+  getDescendants,
+  getBackendOptions,
+} from "@minoru/react-dnd-treeview";
+import { NodeCustomData, NodeModel } from "./components/types";
+import { DragNode } from "./components/drag-node";
+import { AddDialog } from "./components/add-dialog";
+import styles from "./components/tree.module.css";
+
 import { AdminLayout } from "./components/admin-layout";
+import { styled } from "styled-components";
+import { getFirebaseStorageRef } from "../../utils/firebase-utils/firebase-utils";
+import useListItems, {
+  ListItems,
+} from "../../utils/firebase-utils/use-list-items";
+import FullScreenLoadingIndicator from "../../components/full-screen-loading-indicator/full-screen-loading-indicator";
+import {
+  FileType,
+  useUploadManyFiles,
+} from "../../utils/firebase-utils/use-upload-many-files";
 
-type FileType = File & {
-  preview: string;
-  Latitude: number | undefined;
-  Longitude: number | undefined;
-};
-
-const DropzoneContainer = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: ${toRem(20)};
-  border-width: ${toRem(2)};
-  border-radius: ${toRem(2)};
-  border-color: ${(props) => props.theme["palette"].dark};
-  border-style: dashed;
-  background-color: #fafafa;
-  color: #bdbdbd;
-  outline: none;
-  transition: border 0.24s ease-in-out;
-  height: ${toRem(200)};
+const StyledContainer = styled.div`
+  height: 100%;
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
 `;
 
-const PreviewContainer = styled(Stack)`
-  margin-top: ${toRem(24)};
-`;
+const getLastId = (treeData: NodeModel[]): number => {
+  const reversedArray = [...treeData].sort((a, b) => {
+    if (a.id < b.id) {
+      return 1;
+    } else if (a.id > b.id) {
+      return -1;
+    }
 
-const ManagePage: FC = (): JSX.Element | null => {
-  const theme = useTheme();
-  const storageRef = getFirebaseStorageRef();
-  const [files, setFiles] = useState<FileType[]>([]);
-  const [uploadFile, uploading] = useUploadFile();
-
-  const handleUploadAll = useCallback(async () => {
-    Promise.allSettled(
-      files.map(async (selectedFile) => {
-        if (selectedFile) {
-          const fileName = selectedFile.name.toLowerCase().replace(/\s+/g, "-");
-          const ref = firebaseRef(storageRef, fileName);
-          return uploadFile(ref, selectedFile, {
-            contentType: `image/${selectedFile.type}`,
-            customMetadata: {
-              Latitude: selectedFile.Latitude?.toString() ?? "",
-              Longitude: selectedFile.Longitude?.toString() ?? "",
-            },
-          });
-        }
-      })
-    ).then(() => setFiles([]));
-  }, [files, storageRef, uploadFile]);
-
-  const { getRootProps, getInputProps, open } = useDropzone({
-    accept: { "image/*": [] },
-    onDrop: (acceptedFiles) => {
-      Promise.all(
-        acceptedFiles.map(async (file) => {
-          const fileTags = await ExifReader.load(file, { expanded: true });
-          return Object.assign(file, {
-            preview: URL.createObjectURL(file),
-            Latitude: fileTags.gps?.Latitude,
-            Longitude: fileTags.gps?.Longitude,
-          });
-        })
-      ).then((files) => setFiles(files));
-    },
+    return 0;
   });
 
-  const removeFile = useCallback(
-    (file: FileType) => () => {
-      const newFiles = [...files];
-      newFiles.splice(newFiles.indexOf(file), 1);
-      setFiles(newFiles);
-    },
-    [files]
+  if (reversedArray.length > 0) {
+    return reversedArray[0].id as number;
+  }
+
+  return 0;
+};
+
+const convertStringToNumber = (input: string): number => {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash += input.charCodeAt(i);
+  }
+  return hash;
+};
+
+const listItemsToTreeData = ({
+  listItems,
+  parent,
+}: {
+  listItems: ListItems | undefined;
+  parent: number;
+}): NodeModel<NodeCustomData>[] => {
+  if (!listItems) return [];
+
+  const folderNodes: NodeModel<NodeCustomData>[] =
+    listItems?.folders?.map((folder) => ({
+      id: convertStringToNumber(folder.name),
+      parent: parent,
+      droppable: true,
+      text: folder.name,
+    })) ?? [];
+
+  const fileNodes: NodeModel<NodeCustomData>[] =
+    listItems?.files?.map((file) => ({
+      id: convertStringToNumber(file.name),
+      parent: parent,
+      text: file.name,
+      data: {
+        fileType: "image",
+      },
+    })) ?? [];
+
+  return [...folderNodes, ...fileNodes];
+};
+
+const useManagePage = () => {
+  const firebaseStorage = getFirebaseStorageRef();
+  const storageRef = getFirebaseStorageRef();
+  const { uploadManyFiles, createFolder, uploading } = useUploadManyFiles();
+  const { data: listItems, loading: listItemsLoading } = useListItems({
+    storageRef: firebaseStorage,
+    fetchFolders: true,
+    fetchFiles: true,
+  });
+
+  const initialTreeData = listItemsToTreeData({ listItems, parent: 0 });
+  const [treeData, setTreeData] = useState<NodeModel<NodeCustomData>[]>([]);
+
+  const handleDrop = useCallback(
+    (newTree: NodeModel<NodeCustomData>[]) => setTreeData(newTree),
+    []
   );
 
-  const handleUpdateFileName = useCallback(
-    (name: string, fileIndex: number) => {
-      let allFiles = [...files];
-      const fileToUpdate: FileType = allFiles[fileIndex];
-      const fileName = (name.substring(0, name.lastIndexOf(".")) || name)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
+  const [open, setOpen] = useState<boolean>(false);
 
-      const fileExtension = fileToUpdate.type.slice(
-        fileToUpdate.type.lastIndexOf("/") + 1
-      );
+  const handleDelete = useCallback(
+    (id: NodeModel["id"]) => {
+      const deleteIds = [
+        id,
+        ...getDescendants(treeData, id).map((node) => node.id),
+      ];
+      const newTree = treeData.filter((node) => !deleteIds.includes(node.id));
 
-      const updatedFile = new File(
-        [fileToUpdate],
-        `${fileName}.${fileExtension}`,
-        {
-          type: fileToUpdate.type,
+      setTreeData(newTree);
+    },
+    [treeData]
+  );
+
+  const handleOpenDialog = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  const handleCloseDialog = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleTextChange = useCallback(
+    (id: NodeModel["id"], value: string) => {
+      const newTree = treeData.map((node) => {
+        if (node.id === id) {
+          return {
+            ...node,
+            text: value,
+          };
         }
-      );
 
-      allFiles[fileIndex] = Object.assign(updatedFile, {
-        preview: URL.createObjectURL(updatedFile),
-        Latitude: fileToUpdate.Latitude,
-        Longitude: fileToUpdate.Longitude,
+        return node;
       });
-      setFiles(allFiles);
+
+      setTreeData(newTree);
     },
-    [files]
+    [treeData]
   );
 
-  useEffect(
-    () => () => {
-      // Revoke the data uris to avoid memory leaks
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
+  const handleSubmit = useCallback(
+    async (newNode: Omit<NodeModel<NodeCustomData>, "id">) => {
+      const res = await createFolder({ storageRef, folderName: "2019" });
+
+      const lastId = getLastId(treeData) + 1;
+
+      setTreeData([
+        ...treeData,
+        {
+          ...newNode,
+          id: lastId,
+        },
+      ]);
+      setOpen(false);
     },
-    [files]
+    [storageRef, treeData, uploadManyFiles]
   );
+
+  useEffect(() => {
+    if (!listItemsLoading) {
+      setTreeData(initialTreeData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listItemsLoading]);
+
+  return {
+    open,
+    treeData,
+    listItemsLoading,
+    handleDrop,
+    handleDelete,
+    handleOpenDialog,
+    handleCloseDialog,
+    handleTextChange,
+    handleSubmit,
+  };
+};
+
+const ManagePage: FC = (): JSX.Element | null => {
+  const controller = useManagePage();
+
+  if (controller.listItemsLoading) {
+    <CommonPage pageName="Manage">
+      <AdminLayout>
+        <FullScreenLoadingIndicator />
+      </AdminLayout>
+    </CommonPage>;
+  }
 
   return (
-    <CommonPage pageName="Upload">
-      <AdminLayout>Inside</AdminLayout>
+    <CommonPage pageName="Manage">
+      <AdminLayout>
+        <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+          <StyledContainer>
+            <div>
+              <Button
+                onClick={controller.handleOpenDialog}
+                startIcon={<AddIcon />}
+                color="secondary"
+              >
+                Add Folder
+              </Button>
+              {controller.open && (
+                <AddDialog
+                  tree={controller.treeData}
+                  onClose={controller.handleCloseDialog}
+                  onSubmit={controller.handleSubmit}
+                />
+              )}
+            </div>
+            <Tree
+              tree={controller.treeData}
+              rootId={0}
+              render={(node: NodeModel<NodeCustomData>, options) => (
+                <DragNode
+                  node={node}
+                  {...options}
+                  onDelete={controller.handleDelete}
+                  onTextChange={controller.handleTextChange}
+                />
+              )}
+              onDrop={controller.handleDrop}
+              classes={{
+                root: styles["treeRoot"],
+                draggingSource: styles["draggingSource"],
+                dropTarget: styles["dropTarget"],
+              }}
+            />
+          </StyledContainer>
+        </DndProvider>
+      </AdminLayout>
     </CommonPage>
   );
 };

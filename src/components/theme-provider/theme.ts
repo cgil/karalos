@@ -35,7 +35,7 @@ export const theme: DefaultTheme = createTheme({
     },
     secondary: {
       light: "#c7d2fe",
-      main: "#818cf8",
+      main: "#2563eb",
       dark: "#4338ca",
     },
     error: {
