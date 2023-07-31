@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/karalos/static/css/main.ae57cced.css",
-    "main.js": "/karalos/static/js/main.8ce762e9.js",
+    "main.js": "/karalos/static/js/main.cfbd80a1.js",
     "static/js/948.23bc02e6.chunk.js": "/karalos/static/js/948.23bc02e6.chunk.js",
     "static/js/618.57353b88.chunk.js": "/karalos/static/js/618.57353b88.chunk.js",
     "static/js/675.062629ba.chunk.js": "/karalos/static/js/675.062629ba.chunk.js",
@@ -78,7 +78,7 @@
     "static/media/roboto-greek-ext-700-normal.woff": "/karalos/static/media/roboto-greek-ext-700-normal.249853776d22a271b2b5.woff",
     "index.html": "/karalos/index.html",
     "main.ae57cced.css.map": "/karalos/static/css/main.ae57cced.css.map",
-    "main.8ce762e9.js.map": "/karalos/static/js/main.8ce762e9.js.map",
+    "main.cfbd80a1.js.map": "/karalos/static/js/main.cfbd80a1.js.map",
     "948.23bc02e6.chunk.js.map": "/karalos/static/js/948.23bc02e6.chunk.js.map",
     "618.57353b88.chunk.js.map": "/karalos/static/js/618.57353b88.chunk.js.map",
     "675.062629ba.chunk.js.map": "/karalos/static/js/675.062629ba.chunk.js.map",
@@ -100,6 +100,6 @@
   },
   "entrypoints": [
     "static/css/main.ae57cced.css",
-    "static/js/main.8ce762e9.js"
+    "static/js/main.cfbd80a1.js"
   ]
 }
